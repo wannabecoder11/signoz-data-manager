@@ -3,8 +3,8 @@ This app allows you to view and delete specific data from your signoz database, 
 
 
 # To-Do
- - [ ] HTML Webui, basic, with static drop-downs, selects and submits.
- - [ ] Add Some CSS.
+ - [*] HTML Webui, basic, with static drop-downs, selects and submits.
+ - [*] Add Some CSS.
  - [ ] Start BE
     - [ ] Fetch resrouce key,values
     - [ ] pass it to FE JS.
