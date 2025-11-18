@@ -1,6 +1,9 @@
 const http = require('http');
 const { parse } = require('path');
 const url = require('url');
+const fs = require('fs');
+const path = require('path'); // For handling file paths
+
 const { createClient } = require('@clickhouse/client');
 
 const client = createClient({
@@ -94,20 +97,38 @@ const server = http.createServer((req, res) => {
     const parsedURL = url.parse(req.url, true);
     const pathname = parsedURL.pathname;
     const query = parsedURL.query;
-    if (req.url === '/') {
-        res.write(JSON.stringify(req.url));
-        res.end();
-      // console.log(query);
-        res.end(JSON.stringify({
-          pathname,
-          query,
-          fullUrl: resultJSON
-              }, null, 2));
-    } else if (req.url === '/distinct'){
-      res.write(JSON.stringify({distinctEnv, distinctHost, distinctDeploy, distinctDaemon, distinctCluster}))
-      res.end();
-    }
-   
+
+    if (req.url === '/api') {
+        if (req.url === '/distinct'){
+              res.write(JSON.stringify({distinctEnv, distinctHost, distinctDeploy, distinctDaemon, distinctCluster}))
+              res.end();
+            }
+    } else {     // Only serve index.html for the root path
+    const filePath = req.url === '/' ? '/index.html' : req.url;
+    const extname = String(path.extname(filePath)).toLowerCase();
+    const mimeTypes = {
+      '.html': 'text/html',
+      '.js': 'application/javascript',
+      '.css': 'text/css',
+      '.json': 'application/json',
+      '.png': 'image/png',
+      '.jpg': 'image/jpg',
+      '.gif': 'image/gif',
+      '.svg': 'image/svg+xml'
+    };
+    
+    const contentType = mimeTypes[extname] || 'application/octet-stream';
+
+    fs.readFile(path.join(__dirname, filePath), (error, content) => {
+      if (error) {
+        res.writeHead(404);
+        res.end('File not found');
+      } else {
+        res.writeHead(200, { 'Content-Type': contentType });
+        res.end(content);
+      }
+    });
+  } 
 });
 
 server.listen(3000);
