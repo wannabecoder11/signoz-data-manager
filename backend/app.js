@@ -54,32 +54,6 @@ async function run() {
 run().catch(console.error);
 
 
-const server = http.createServer((req, res) => {
-    const parsedURL = url.parse(req.url, true);
-    const pathname = parsedURL.pathname;
-    const query = parsedURL.query;
-//    if (req.url === '/') {
-       res.writeHead(200, {
-                'Content-Type': 'text/html',
-                'X-Powered-By': 'Node.js',
-                'Cache-Control': 'no-cache, no-store, must-revalidate',
-                'Set-Cookie': 'sessionid=abc123; HttpOnly'
-            });
-
-    //    res.write(JSON.stringify(req.url));
-    //    res.end();
-    console.log(query);
-       res.end(JSON.stringify({
-        pathname,
-        query,
-        fullUrl: resultJSON
-            }, null, 2));
-//    }
-   
-});
-
-server.listen(3000);
-console.log('Listening on Port 3000');
 let distinctEnv
 let distinctHost
 let distinctDeploy
@@ -103,15 +77,38 @@ async function getDistinctResources() {
     distinctDeploy = [...new Set(allRows.map(obj => JSON.parse(obj.labels)["k8s.deployment.name"]))];
     distinctDaemon = [...new Set(allRows.map(obj => JSON.parse(obj.labels)["k8s.daemonset.name"]))];
     distinctCluster = [...new Set(allRows.map(obj => JSON.parse(obj.labels)["k8s.cluster.name"]))];
-
-    console.log(`distinct envs are ${distinctEnv}`); // allRows is an array of row objects
-    console.log(`distinct Hosts are ${distinctHost}`); // allRows is an array of row objects
-    console.log(`distinct Deployments are ${distinctDeploy}`); // allRows is an array of row objects
-    console.log(`distinct Daemonsets are ${distinctDaemon}`); // allRows is an array of row objects
-    console.log(`distinct Clusters are ${distinctCluster}`); // allRows is an array of row objects
+    console.log('Fetching resouces complete')
+    // console.log(`distinct envs are ${distinctEnv}`); // allRows is an array of row objects
+    // console.log(`distinct Hosts are ${distinctHost}`); // allRows is an array of row objects
+    // console.log(`distinct Deployments are ${distinctDeploy}`); // allRows is an array of row objects
+    // console.log(`distinct Daemonsets are ${distinctDaemon}`); // allRows is an array of row objects
+    // console.log(`distinct Clusters are ${distinctCluster}`); // allRows is an array of row objects
 
   } catch (err) {
     console.error('Query error:', err);
   }
 }
 getDistinctResources().catch(console.error);
+
+const server = http.createServer((req, res) => {
+    const parsedURL = url.parse(req.url, true);
+    const pathname = parsedURL.pathname;
+    const query = parsedURL.query;
+    if (req.url === '/') {
+        res.write(JSON.stringify(req.url));
+        res.end();
+      // console.log(query);
+        res.end(JSON.stringify({
+          pathname,
+          query,
+          fullUrl: resultJSON
+              }, null, 2));
+    } else if (req.url === '/distinct'){
+      res.write(JSON.stringify({distinctEnv, distinctHost, distinctDeploy, distinctDaemon, distinctCluster}))
+      res.end();
+    }
+   
+});
+
+server.listen(3000);
+console.log('Listening on Port 3000');
