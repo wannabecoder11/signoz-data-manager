@@ -3,14 +3,14 @@ This app allows you to view and delete specific data from your signoz database, 
 
 
 # To-Do
- - [*] HTML Webui, basic, with static drop-downs, selects and submits.
- - [*] Add Some CSS.
- - [ ] Start BE
-    - [ ] Fetch resrouce key,values
-    - [ ] pass it to FE JS.
+ - [x] HTML Webui, basic, with static drop-downs, selects and submits.
+ - [x] Add Some CSS.
+ - [x] Start BE
+    - [x] Fetch resrouce key,values
+    - [x] pass it to FE JS.
 
  - [ ] Start FE JS.
-    - [ ] Fetch resource key-values from BE.
+    - [x] Fetch resource key-values from BE.
     - [ ] Added these keys to Drop-Downs(replace the statics from HTMML). 
     - [ ] For each key selected, fetch the available values.
     - [ ] Submit and send the submitted key-values to BE to fetch the data.
