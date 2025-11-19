@@ -10,51 +10,26 @@
    <div class="sideBar">
     <form action="http://localhost:3000" method="get">
     <div class="sideBarTitle">Filters</div>
+
+        <span class="resrouceKeys">Environment</span>
         <div class="resourceBox" id="environment">
-            <span class="resrouceKeys">Environment</span>
-            <div class="option">
-                    <input type="checkbox" id="first1" name="first" value="option1">
-                    <label for="first1">Option 1</label>
-            </div>
-            <div class="option">
-                <input type="checkbox" id="second1" name="first" value="option2">
-                <label for="second1">Option 2</label>
-            </div>
-            <div class="option">
-                <input type="checkbox" id="third1" name="first" value="option3">
-                <label for="third1">Option 3</label>
-            </div>
         </div>
-        <div class="resourceBox" hidden id="host">
-            <span class="resrouceKeys">Second Dropdown</span>
-            <div class="option">
-                <input type="checkbox" id="first2" name="second" value="option1">
-                <label for="first2">Option 1</label>
-            </div>
-            <div class="option">
-                <input type="checkbox" id="second2" name="second" value="option2">
-                <label for="second2">Option 2</label>
-            </div>
-            <div class="option">
-               <input type="checkbox" id="third2" name="second" value="option3">
-               <label for="third2">Option 3</label>
-            </div>
+        <span class="resrouceKeys">Hosts</span>
+        <div class="resourceBox" id="host">
         </div>
-        <div class="resourceBox" hidden>
-            <span class="resrouceKeys">Third  Dropdown</span>
-            <div class="option">
-               <input type="checkbox" id="first3" name="third" value="option1">
-               <label for="first3">Option 1</label>
-            </div>
-            <div class="option">
-                <input type="checkbox" id="second3" name="third" value="option2">
-                <label for="second3">Option 2</label>
-            </div>
-            <div class="option">
-                <input type="checkbox" id="third3" name="third" value="option3">
-                <label for="third3">Option 3</label>
-            </div>
+
+        <span class="resrouceKeys">Clusters</span>
+        <div class="resourceBox" id="cluster">
         </div>
+
+        <span class="resrouceKeys">Deployments</span>
+        <div class="resourceBox" id="deploy">
+        </div>
+
+        <span class="resrouceKeys">Daemonsets</span>
+        <div class="resourceBox" id="daemon">
+        </div>
+
         <button>Submit</button>
     </form>
    </div> 
