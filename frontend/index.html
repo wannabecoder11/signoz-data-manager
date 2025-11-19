@@ -10,8 +10,8 @@
    <div class="sideBar">
     <form action="http://localhost:3000" method="get">
     <div class="sideBarTitle">Filters</div>
-        <div class="resourceBox">
-            <span class="resrouceKeys">First Dropdown</span>
+        <div class="resourceBox" id="environment">
+            <span class="resrouceKeys">Environment</span>
             <div class="option">
                     <input type="checkbox" id="first1" name="first" value="option1">
                     <label for="first1">Option 1</label>
@@ -25,7 +25,7 @@
                 <label for="third1">Option 3</label>
             </div>
         </div>
-        <div class="resourceBox">
+        <div class="resourceBox" hidden id="host">
             <span class="resrouceKeys">Second Dropdown</span>
             <div class="option">
                 <input type="checkbox" id="first2" name="second" value="option1">
@@ -40,7 +40,7 @@
                <label for="third2">Option 3</label>
             </div>
         </div>
-        <div class="resourceBox">
+        <div class="resourceBox" hidden>
             <span class="resrouceKeys">Third  Dropdown</span>
             <div class="option">
                <input type="checkbox" id="first3" name="third" value="option1">

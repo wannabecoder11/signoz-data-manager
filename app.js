@@ -118,7 +118,7 @@ const server = http.createServer((req, res) => {
       
       const contentType = mimeTypes[extname] || 'application/octet-stream';
 
-      fs.readFile(path.join(__dirname, filePath), (error, content) => {
+      fs.readFile(path.join(__dirname, "/frontend", filePath), (error, content) => {
         if (error) {
           res.writeHead(404);
           res.end('File not found');
