@@ -8,8 +8,7 @@ fetch('http://localhost:3000/api/distinct')
     //   console.table(response);
     getDistinctResources = response
 
-    const distinctEnv = getDistinctResources["distinctEnv"]
-    displayValues(distinctEnv, "environment");
+    displayValues(getDistinctResources["distinctEnv"], "environment");
     displayValues(getDistinctResources["distinctHost"], "host")
     displayValues(getDistinctResources["distinctCluster"], "cluster")
     displayValues(getDistinctResources["distinctDeploy"], "deploy")
