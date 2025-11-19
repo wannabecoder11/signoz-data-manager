@@ -23,7 +23,7 @@ body {
 }
 .resourceKeys {
     padding: 8px;
-    display: block;
+    /* display: block; */
     font-size: large;
     background-color: lightgreen;
     border-top-left-radius: 5px;

@@ -8,25 +8,27 @@
 </head>
 <body>
    <div class="sideBar">
-    <form action="http://localhost:3000" method="get">
+    <form action="http://localhost:3000/api/fetch" method="GET">
     <div class="sideBarTitle">Filters</div>
 
-        <span class="resourceKeys">Environment</span>
+        <div class="resourceKeys">Environment</div>
         <div class="resourceBox" id="environment">
         </div>
-        <span class="resourceKeys">Hosts</span>
-        <div class="resourceBox" id="host">
-        </div>
 
-        <span class="resourceKeys">Clusters</span>
+        <div class="resourceKeys">Clusters</div>
         <div class="resourceBox" id="cluster">
         </div>
 
-        <span class="resourceKeys">Deployments</span>
+
+        <div class="resourceKeys" >Hosts</div>
+        <div class="resourceBox" id="host">
+        </div>
+
+         <div class="resourceKeys" >Deployments</div>
         <div class="resourceBox" id="deploy">
         </div>
 
-        <span class="resourceKeys">Daemonsets</span>
+        <div class="resourceKeys" >Daemonsets</div>
         <div class="resourceBox" id="daemon">
         </div>
 

@@ -16,9 +16,10 @@ fetch('http://localhost:3000/api/distinct')
 
     });;
 
-function displayValues(distinctValues, valueType) {
+function displayValues(distinctValues, resourceName) {
     for (key in distinctValues) {
-      const envDiv = document.getElementById(`${valueType}`);
+      const envDiv = document.getElementById(`${resourceName}`);
+      // envDiv.removeAttribute("hidden")
       console.log(distinctValues[key]);
       const envListDiv = document.createElement("div")
       const envListInput = document.createElement("input")
@@ -26,13 +27,14 @@ function displayValues(distinctValues, valueType) {
       envListDiv.setAttribute("class", "option")
       envListInput.setAttribute("type", "checkbox" )
       envListInput.setAttribute("id", distinctValues[key]);
-      envListInput.setAttribute("name", "distinctValues")
+      envListInput.setAttribute("name", resourceName)
       envListInput.setAttribute("value", distinctValues[key])
       envListLabel.setAttribute("for", distinctValues[key])
       envListLabel.innerText = distinctValues[key];
       envDiv.appendChild(envListDiv)
       envListDiv.appendChild(envListInput)
       envListDiv.appendChild(envListLabel)
+      envListDiv.onclick 
 
     }
 }

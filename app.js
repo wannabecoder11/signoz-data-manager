@@ -102,6 +102,10 @@ const server = http.createServer((req, res) => {
               res.write(JSON.stringify({distinctEnv, distinctHost, distinctDeploy, distinctDaemon, distinctCluster}))
               res.end();
             }
+        if (req.url.startsWith('/api/fetch')){
+              console.log(query)
+              res.end();
+            }
     } else {     // Only serve index.html for the root path
       const filePath = req.url === '/' ? '/index.html' : req.url;
       const extname = String(path.extname(filePath)).toLowerCase();
