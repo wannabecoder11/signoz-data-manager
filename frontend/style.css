@@ -5,13 +5,18 @@ body {
     font-size: large;
     font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
     border-top-style: solid;
-
+    /* height: ; */
+    max-height: 20rem;
+    overflow: auto;
     span {
         display: block;
     }
 
     .option {
         display: block;
+        overflow: auto;
+        overflow-x: auto;
+        overflow-y: auto;
     }
 
 }
@@ -26,17 +31,18 @@ body {
 
 
 .sideBar {
-    width: 15vw;
+    width: 18vw;
     height: 100vw;
     border-style: solid;
     border-radius: 7px;
     background-color: beige;
     margin: 2px;
     padding: 4px;
+    height: 100vw;
 }
 
 .main {
-    width: 83vw;
+    width: 73vw;
     height: 100vw;
     border-style: dotted;
     display: felxbox;
