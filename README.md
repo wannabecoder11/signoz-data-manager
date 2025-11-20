@@ -20,13 +20,14 @@ This app allows you to view and delete specific data from your signoz database, 
 
 
 # FE
-
-- load K8s/Non K8s, with even listners, the same function to display the lists, k8s selection call the function twice, once for deploy, second for daemonsets, non-k8s selection calls it for just the hosts.
-
-
-- when selecting k8s cluster, make call to /api/clusters and get list of clusters and should remove hosts selection, and only show deployment and daemonset selection lists
+- create displayList function, takes list of items, type of resource(hosts, daemonsets) use this for div name also, 
+- load K8s/Non K8s, with even listners,  non-k8s selection calls it for just the hosts, 
+- on k8s selection, call /api/clusters and get a list of k8s clusters, add event listeners to the list.
+- on selection of any of the cluster, call the daemonsets and deployments api , get the lists, and call the display function on both of them
+- on and only show deployment and daemonset selection lists
 - make sure daemonset and deployments are not selected at the same time, give error
-- when selecting non-k8s, it should remove or not display deployments and daemonsets, and only leave hosts option, it should then make calls to /api/hosts and get a list of hosts which are not have k8s resources. 
+- the same function to display the lists, k8s selection call the function twice, once for deploy, second for daemonsets,
+- when selecting non-k8s, calls to /api/hosts and get a list of hosts which are not have k8s resources. 
 
 
 - the displayNextList function can take inputs: selected items list, div to draw/redraw, resrouceType(like hosts, clusters, daemonsets)

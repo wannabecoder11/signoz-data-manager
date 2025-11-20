@@ -62,18 +62,19 @@ let distinctHost
 let distinctDeploy
 let distinctDaemon
 let distinctCluster
+let allRows
 
 async function getDistinctResources() {
   try {
     const resultSet = await client.query({
       query: `SELECT DISTINCT labels
       FROM signoz_logs.logs_v2_resource
-      Limit 1000;`,
+      Limit 3000;`,
 
       format: 'JSONEachRow',
     });
      // fetch all results as JSON array
-    const allRows = await resultSet.json();
+    allRows = await resultSet.json();
     // console.log(allRows)
     distinctEnv = [...new Set(allRows.map(obj => JSON.parse(obj.labels)["deployment.environment"]))];
     distinctHost = [...new Set(allRows.map(obj => JSON.parse(obj.labels)["host.name"]))];
@@ -86,6 +87,9 @@ async function getDistinctResources() {
     // console.log(`distinct Deployments are ${distinctDeploy}`); // allRows is an array of row objects
     // console.log(`distinct Daemonsets are ${distinctDaemon}`); // allRows is an array of row objects
     // console.log(`distinct Clusters are ${distinctCluster}`); // allRows is an array of row objects
+
+    getDaemonSets(["trg-env"], allRows)
+    getDeployments(["trg-env"], allRows)
 
   } catch (err) {
     console.error('Query error:', err);
@@ -103,6 +107,20 @@ const server = http.createServer((req, res) => {
               res.end();
             }
         if (req.url.startsWith('/api/fetch')){
+              console.log(query)
+              res.end();
+            }
+        if (req.url.startsWith('/api/clusters')){
+              // console.log(query)
+              const deploymnts = getDeployments(query.clusters, allRows)
+              res.write((JSON.stringify(deploymnts)))
+              res.end();
+            }
+        if (req.url.startsWith('/api/daemonsets')){
+              console.log(query)
+              res.end();
+            }
+        if (req.url.startsWith('/api/deployments')){
               console.log(query)
               res.end();
             }
@@ -136,3 +154,27 @@ const server = http.createServer((req, res) => {
 
 server.listen(3000);
 console.log('Listening on Port 3000');
+
+function getDaemonSets(selectedClusters, allResources) {
+  const filteredResources = allResources.filter(resource => selectedClusters.includes(JSON.parse(resource.labels)["k8s.cluster.name"]))
+  const filteredDaemon = [...new Set(filteredResources.map(obj => JSON.parse(obj.labels)["k8s.daemonset.name"]))];
+  console.log('Filtered daemonsets are' + filteredDaemon);
+  return filteredDaemon;
+};
+
+function getDeployments(selectedClusters, allResources) {
+  const filteredResources = allResources.filter(resource => selectedClusters.includes(JSON.parse(resource.labels)["k8s.cluster.name"]))
+  const filteredDeployments = [...new Set(filteredResources.map(obj => JSON.parse(obj.labels)["k8s.deployment.name"]))];
+  console.log('Filtered deployments are' + filteredDeployments);
+
+  return filteredDeployments;
+};
+
+
+function getClusters(selectedClusters, allResources) {
+  const filteredResources = allResources.filter(resource => selectedClusters.includes(JSON.parse(resource.labels)["k8s.cluster.name"]))
+  const filteredDeployments = [...new Set(filteredResources.map(obj => JSON.parse(obj.labels)["k8s.deployment.name"]))];
+  console.log('Filtered deployments are' + filteredDeployments);
+
+  return filteredDeployments;
+};

@@ -27,7 +27,7 @@ function displayValues(distinctValues, resourceName) {
       envListDiv.setAttribute("class", "option")
       envListInput.setAttribute("type", "checkbox" )
       envListInput.setAttribute("id", distinctValues[key]);
-      envListInput.setAttribute("name", resourceName)
+      envListInput.setAttribute("name", e)
       envListInput.setAttribute("value", distinctValues[key])
       envListLabel.setAttribute("for", distinctValues[key])
       envListLabel.innerText = distinctValues[key];
