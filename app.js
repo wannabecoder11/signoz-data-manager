@@ -69,7 +69,7 @@ async function getDistinctResources() {
     const resultSet = await client.query({
       query: `SELECT DISTINCT labels
       FROM signoz_logs.logs_v2_resource
-      Limit 30000;`,
+      Limit 300000;`,
 
       format: 'JSONEachRow',
     });
@@ -127,7 +127,7 @@ const server = http.createServer((req, res) => {
             }
         if (req.url.startsWith('/api/hosts')){
               console.log(query)
-              res.write((JSON.stringify(distinctHost)))
+              res.write((JSON.stringify(getHosts(allRows))))
               res.end();
             }
 
@@ -186,11 +186,11 @@ function getClusters(selectedEnvs, allResources) {
   return filteredEnvs;
 };
 
-function getHosts(selectedEnvs, allResources) {
+function getHosts(allResources) {
+  // removing all hosts which has k8s.cluster.name in it's string
+  const filteredResources = allResources.filter((resource) => !Object.keys(JSON.parse(resource.labels)).includes("k8s.cluster.name"));
+  // finding distinct values
+  const filteredHosts = [...new Set(filteredResources.map(obj => JSON.parse(obj.labels)["host.name"]))];
 
-  const filteredResources = allResources.filter((resource) => selectedEnvs.includes(JSON.parse(resource.labels)["deployment.environment "]))
-  const filteredEnvs = [...new Set(filteredResources.map(obj => JSON.parse(obj.labels)["k8s.cluster.name"]))];
-  console.log('Filtered Envs are: ' + filteredEnvs);
-
-  return filteredEnvs;
+  return filteredHosts;
 };
