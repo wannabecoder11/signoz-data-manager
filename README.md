@@ -20,19 +20,20 @@ This app allows you to view and delete specific data from your signoz database, 
 
 
 # FE
-- FE loads, JS makes GET call to /api/distinctEnv, recieves the list and then dislays the list in sidebar.
 
-- when selecting k8s cluster should remove all hosts which are not k8s
-- add event listeners to the list for changes, which makes a get call to /api/distinctCluster with list of selected items and recieves a list of clusters, this call the displaynextlist function to redraw this, keep calling the endpoint and redrawing.
+- load K8s/Non K8s, with even listners, the same function to display the lists, k8s selection call the function twice, once for deploy, second for daemonsets, non-k8s selection calls it for just the hosts.
+
+
+- when selecting k8s cluster, make call to /api/clusters and get list of clusters and should remove hosts selection, and only show deployment and daemonset selection lists
+- make sure daemonset and deployments are not selected at the same time, give error
+- when selecting non-k8s, it should remove or not display deployments and daemonsets, and only leave hosts option, it should then make calls to /api/hosts and get a list of hosts which are not have k8s resources. 
+
+
 - the displayNextList function can take inputs: selected items list, div to draw/redraw, resrouceType(like hosts, clusters, daemonsets)
-- After env list, make a list of k8s or non-k8s, non-k8s removes all options realted to k8s, and k8s should remove all hosts
-- add event listeners to the list for changes, which makes a get call to /api/distinctHosts and recieves a list of hosts
-- add event listeners to the list for changes, which makes a get call to /api/distinctDeploy and recieves a list of deployments
-- add event listeners to the list for changes, which makes a get call to /api/distinctDaemon and recieves a list of deployments
 
 
-- Steps
-   - load K8s/Non K8s, with even listners
-   - K8s brings list with Cluster
-      cluster brings Daemonsets and deployments
-   - Non K8s brings hostnames which doesn't have any k8s attributes.
+# BE
+- /api/clusters gives list of available k8s clusters
+- /api/daemonsets takes a list of clusters and returns list of daemonsets, 
+- /api/deployments takes a lsit of clusters and returns list of deployments
+- /api/hosts returns list of hosts which don't belong to k8s cluster
