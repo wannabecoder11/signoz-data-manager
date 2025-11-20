@@ -69,7 +69,7 @@ async function getDistinctResources() {
     const resultSet = await client.query({
       query: `SELECT DISTINCT labels
       FROM signoz_logs.logs_v2_resource
-      Limit 3000;`,
+      Limit 30000;`,
 
       format: 'JSONEachRow',
     });
@@ -111,19 +111,26 @@ const server = http.createServer((req, res) => {
               res.end();
             }
         if (req.url.startsWith('/api/clusters')){
-              // console.log(query)
-              const deploymnts = getDeployments(query.clusters, allRows)
-              res.write((JSON.stringify(deploymnts)))
+              res.write((JSON.stringify(distinctCluster)))
               res.end();
             }
         if (req.url.startsWith('/api/daemonsets')){
               console.log(query)
+              res.write((JSON.stringify(getDaemonSets(query.clusters, allRows))))
+
               res.end();
             }
         if (req.url.startsWith('/api/deployments')){
-              console.log(query)
+              console.log(JSON.stringify(query))
+              res.write((JSON.stringify(getDeployments(query.clusters, allRows))))
               res.end();
             }
+        if (req.url.startsWith('/api/hosts')){
+              console.log(query)
+              res.write((JSON.stringify(distinctHost)))
+              res.end();
+            }
+
     } else {     // Only serve index.html for the root path
       const filePath = req.url === '/' ? '/index.html' : req.url;
       const extname = String(path.extname(filePath)).toLowerCase();
@@ -156,14 +163,14 @@ server.listen(3000);
 console.log('Listening on Port 3000');
 
 function getDaemonSets(selectedClusters, allResources) {
-  const filteredResources = allResources.filter(resource => selectedClusters.includes(JSON.parse(resource.labels)["k8s.cluster.name"]))
+  const filteredResources = allResources.filter((resource) => selectedClusters.includes(JSON.parse(resource.labels)["k8s.cluster.name"]))
   const filteredDaemon = [...new Set(filteredResources.map(obj => JSON.parse(obj.labels)["k8s.daemonset.name"]))];
   console.log('Filtered daemonsets are' + filteredDaemon);
   return filteredDaemon;
 };
 
 function getDeployments(selectedClusters, allResources) {
-  const filteredResources = allResources.filter(resource => selectedClusters.includes(JSON.parse(resource.labels)["k8s.cluster.name"]))
+  const filteredResources = allResources.filter((resource) => selectedClusters.includes(JSON.parse(resource.labels)["k8s.cluster.name"]))
   const filteredDeployments = [...new Set(filteredResources.map(obj => JSON.parse(obj.labels)["k8s.deployment.name"]))];
   console.log('Filtered deployments are' + filteredDeployments);
 
@@ -171,10 +178,19 @@ function getDeployments(selectedClusters, allResources) {
 };
 
 
-function getClusters(selectedClusters, allResources) {
-  const filteredResources = allResources.filter(resource => selectedClusters.includes(JSON.parse(resource.labels)["k8s.cluster.name"]))
-  const filteredDeployments = [...new Set(filteredResources.map(obj => JSON.parse(obj.labels)["k8s.deployment.name"]))];
-  console.log('Filtered deployments are' + filteredDeployments);
+function getClusters(selectedEnvs, allResources) {
+  const filteredResources = allResources.filter((resource) => selectedEnvs.includes(JSON.parse(resource.labels)["deployment.environment "]))
+  const filteredEnvs = [...new Set(filteredResources.map(obj => JSON.parse(obj.labels)["k8s.cluster.name"]))];
+  console.log('Filtered Envs are: ' + filteredEnvs);
 
-  return filteredDeployments;
+  return filteredEnvs;
+};
+
+function getHosts(selectedEnvs, allResources) {
+
+  const filteredResources = allResources.filter((resource) => selectedEnvs.includes(JSON.parse(resource.labels)["deployment.environment "]))
+  const filteredEnvs = [...new Set(filteredResources.map(obj => JSON.parse(obj.labels)["k8s.cluster.name"]))];
+  console.log('Filtered Envs are: ' + filteredEnvs);
+
+  return filteredEnvs;
 };

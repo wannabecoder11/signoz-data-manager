@@ -21,7 +21,7 @@ This app allows you to view and delete specific data from your signoz database, 
 
 # FE
 - create displayList function, takes list of items, type of resource(hosts, daemonsets) use this for div name also, 
-- load K8s/Non K8s, with even listners,  non-k8s selection calls it for just the hosts, 
+- load K8s/Non K8s, with even listners,  non-k8s selection calls it for Env and then just the hosts, 
 - on k8s selection, call /api/clusters and get a list of k8s clusters, add event listeners to the list.
 - on selection of any of the cluster, call the daemonsets and deployments api , get the lists, and call the display function on both of them
 - on and only show deployment and daemonset selection lists
