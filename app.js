@@ -7,10 +7,11 @@ const path = require('path'); // For handling file paths
 const { createClient } = require('@clickhouse/client');
 
 const client = createClient({
-        url: process.env.CLICKHOUSE_HOST ?? 'http://localhost:8123',
-        username: process.env.CLICKHOUSE_USER ?? 'default',
-        password: process.env.CLICKHOUSE_PASSWORD ?? '', }); // adjust config
-let resultJSON 
+  url: process.env.CLICKHOUSE_HOST ?? 'http://localhost:8123',
+  username: process.env.CLICKHOUSE_USER ?? 'default',
+  password: process.env.CLICKHOUSE_PASSWORD ?? '',
+}); // adjust config
+let resultJSON
 async function run() {
   try {
     const resultSet = await client.query({
@@ -29,7 +30,7 @@ async function run() {
     });
 
     const stream = resultSet.stream();
-     // fetch all results as JSON array
+    // fetch all results as JSON array
     const allRows = await resultSet.json();
     resultJSON = allRows;
 
@@ -73,7 +74,7 @@ async function getDistinctResources() {
 
       format: 'JSONEachRow',
     });
-     // fetch all results as JSON array
+    // fetch all results as JSON array
     allRows = await resultSet.json();
     // console.log(allRows)
     distinctEnv = [...new Set(allRows.map(obj => JSON.parse(obj.labels)["deployment.environment"]))];
@@ -98,65 +99,65 @@ async function getDistinctResources() {
 getDistinctResources().catch(console.error);
 
 const server = http.createServer((req, res) => {
-    const parsedURL = url.parse(req.url, true);
-    const pathname = parsedURL.pathname;
-    const query = parsedURL.query;
-    if (req.url.startsWith('/api')) {
-        if (req.url === '/api/distinct'){
-              res.write(JSON.stringify({distinctEnv, distinctHost, distinctDeploy, distinctDaemon, distinctCluster}))
-              res.end();
-            }
-        if (req.url.startsWith('/api/fetch')){
-              console.log(query)
-              res.end();
-            }
-        if (req.url.startsWith('/api/clusters')){
-              res.write((JSON.stringify(distinctCluster)))
-              res.end();
-            }
-        if (req.url.startsWith('/api/daemonsets')){
-              console.log(query)
-              res.write((JSON.stringify(getDaemonSets(query.clusters, allRows))))
+  const parsedURL = url.parse(req.url, true);
+  const pathname = parsedURL.pathname;
+  const query = parsedURL.query;
+  if (req.url.startsWith('/api')) {
+    if (req.url === '/api/distinct') {
+      res.write(JSON.stringify({ distinctEnv, distinctHost, distinctDeploy, distinctDaemon, distinctCluster }))
+      res.end();
+    }
+    if (req.url.startsWith('/api/fetch')) {
+      console.log(query)
+      res.end();
+    }
+    if (req.url.startsWith('/api/clusters')) {
+      res.write((JSON.stringify(distinctCluster)))
+      res.end();
+    }
+    if (req.url.startsWith('/api/daemonsets')) {
+      console.log(query)
+      res.write((JSON.stringify(getDaemonSets(query.clusters, allRows))))
 
-              res.end();
-            }
-        if (req.url.startsWith('/api/deployments')){
-              console.log(JSON.stringify(query))
-              res.write((JSON.stringify(getDeployments(query.clusters, allRows))))
-              res.end();
-            }
-        if (req.url.startsWith('/api/hosts')){
-              console.log(query)
-              res.write((JSON.stringify(getHosts(allRows))))
-              res.end();
-            }
+      res.end();
+    }
+    if (req.url.startsWith('/api/deployments')) {
+      console.log(JSON.stringify(query))
+      res.write((JSON.stringify(getDeployments(query.clusters, allRows))))
+      res.end();
+    }
+    if (req.url.startsWith('/api/hosts')) {
+      console.log(query)
+      res.write((JSON.stringify(getHosts(allRows))))
+      res.end();
+    }
 
-    } else {     // Only serve index.html for the root path
-      const filePath = req.url === '/' ? '/index.html' : req.url;
-      const extname = String(path.extname(filePath)).toLowerCase();
-      const mimeTypes = {
-        '.html': 'text/html',
-        '.js': 'application/javascript',
-        '.css': 'text/css',
-        '.json': 'application/json',
-        '.png': 'image/png',
-        '.jpg': 'image/jpg',
-        '.gif': 'image/gif',
-        '.svg': 'image/svg+xml'
-      };
-      
-      const contentType = mimeTypes[extname] || 'application/octet-stream';
+  } else {     // Only serve index.html for the root path
+    const filePath = req.url === '/' ? '/index.html' : req.url;
+    const extname = String(path.extname(filePath)).toLowerCase();
+    const mimeTypes = {
+      '.html': 'text/html',
+      '.js': 'application/javascript',
+      '.css': 'text/css',
+      '.json': 'application/json',
+      '.png': 'image/png',
+      '.jpg': 'image/jpg',
+      '.gif': 'image/gif',
+      '.svg': 'image/svg+xml'
+    };
 
-      fs.readFile(path.join(__dirname, "/frontend", filePath), (error, content) => {
-        if (error) {
-          res.writeHead(404);
-          res.end('File not found');
-        } else {
-          res.writeHead(200, { 'Content-Type': contentType });
-          res.end(content);
-        }
-      });
-    } 
+    const contentType = mimeTypes[extname] || 'application/octet-stream';
+
+    fs.readFile(path.join(__dirname, "/frontend", filePath), (error, content) => {
+      if (error) {
+        res.writeHead(404);
+        res.end('File not found');
+      } else {
+        res.writeHead(200, { 'Content-Type': contentType });
+        res.end(content);
+      }
+    });
+  }
 });
 
 server.listen(3000);
@@ -191,6 +192,5 @@ function getHosts(allResources) {
   const filteredResources = allResources.filter((resource) => !Object.keys(JSON.parse(resource.labels)).includes("k8s.cluster.name"));
   // finding distinct values
   const filteredHosts = [...new Set(filteredResources.map(obj => JSON.parse(obj.labels)["host.name"]))];
-
   return filteredHosts;
 };
