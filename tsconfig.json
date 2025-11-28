@@ -25,7 +25,7 @@
     "rootDir": "./src",                          // Root directory of input files
     "forceConsistentCasingInFileNames": true,   // Disallow inconsistently-cased imports
   },
-  "include": ["src"],                            // Include all TS files under src
+  "include": ["src", "frontend", "backend/app.ts"],                            // Include all TS files under src
   "exclude": ["node_modules", "dist"]            // Exclude node_modules and dist folders
   
 }

@@ -25,7 +25,6 @@ function displayValues(distinctValues: string[], resrouceType: string) {
     distinctValues.forEach(item => {
 
       const envDiv = document.getElementById(`${resrouceType}`);
-      // envDiv.removeAttribute("hidden")
       console.log(item);
       const envListDiv = document.createElement("div")
       const envListInput = document.createElement("input")
@@ -33,16 +32,17 @@ function displayValues(distinctValues: string[], resrouceType: string) {
       envListDiv.setAttribute("class", "option")
       envListInput.setAttribute("type", "checkbox" )
       envListInput.setAttribute("id", item);
-      envListInput.setAttribute("name", e)
+      envListInput.setAttribute("name", resrouceType)
       envListInput.setAttribute("value", item)
       envListLabel.setAttribute("for", item)
-      envListLabel.innerText = item;
-      envDiv.appendChild(envListDiv)
-      envListDiv.appendChild(envListInput)
-      envListDiv.appendChild(envListLabel)
-      envListDiv.onclick 
-
-    }})
+      if (envDiv) {
+        envDiv.appendChild(envListDiv)
+        envDiv.removeAttribute("hidden")
+        envListLabel.innerText = item;
+        envListDiv.appendChild(envListInput)
+        envListDiv.appendChild(envListLabel)
+      }
+    })}
 const k8sDiv = document.getElementById(`k8sType`);
 k8sDiv?.addEventListener("click", (e) => {
 
@@ -52,22 +52,23 @@ k8sDiv?.addEventListener("click", (e) => {
       })
       .then(function(response) {
       const clusters: Array<string> = response
+      displayValues(clusters, "clusters");
 })
 })
 
 
-const envListDiv = document.createElement("div")
-const envListInput = document.createElement("input")
-const envListLabel = document.createElement("label")
-envListDiv.setAttribute("class", "option")
-envListInput.setAttribute("type", "checkbox" )
-envListInput.setAttribute("id", distinctValues[key]);
-envListInput.setAttribute("name", e)
-envListInput.setAttribute("value", distinctValues[key])
-envListLabel.setAttribute("for", distinctValues[key])
-envListLabel.innerText = distinctValues[key];
-envDiv.appendChild(envListDiv)
-envListDiv.appendChild(envListInput)
-envListDiv.appendChild(envListLabel)
-envListDiv.onclick 
+// const envListDiv = document.createElement("div")
+// const envListInput = document.createElement("input")
+// const envListLabel = document.createElement("label")
+// envListDiv.setAttribute("class", "option")
+// envListInput.setAttribute("type", "checkbox" )
+// envListInput.setAttribute("id", distinctValues[key]);
+// envListInput.setAttribute("name", e)
+// envListInput.setAttribute("value", distinctValues[key])
+// envListLabel.setAttribute("for", distinctValues[key])
+// envListLabel.innerText = distinctValues[key];
+// envDiv.appendChild(envListDiv)
+// envListDiv.appendChild(envListInput)
+// envListDiv.appendChild(envListLabel)
+// envListDiv.onclick 
 
