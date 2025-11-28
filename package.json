@@ -5,6 +5,7 @@
   },
   "devDependencies": {
     "@types/node": "^24.10.1",
+    "concurrently": "^9.2.1",
     "copyfiles": "^2.4.1",
     "nodemon": "^3.1.11",
     "tsx": "^4.20.6",
@@ -12,7 +13,12 @@
     "undici-types": "^7.16.0"
   },
   "scripts": {
-    "dev": "tsx watch src/*.ts",
-    "build": "tsc && copyfiles -u 1 \"src/**/*.{html,css}\" dist/"
+    "build": "npm run build:frontend && npm run build:backend",
+    "build:frontend": "tsc -p tsconfig.frontend.json && copyfiles -u 2 \"frontend/src/**/*.{html,css,svg,png}\" frontend/dist",
+    "build:backend": "tsc -p tsconfig.backend.json",
+    "dev": "concurrently \"npm run dev:frontend\" \"npm run dev:backend\"",
+    "dev:frontend": "concurrently \"tsc -p tsconfig.frontend.json --watch\" \"copyfiles -u 2 \\\"frontend/src/**/*.{html,css,svg,png}\\\" frontend/dist/ --watch\"",
+    "dev:backend": "nodemon backend/dist/app.js",
+    "clean": "rm -rf frontend/dist backend/dist"
   }
 }
