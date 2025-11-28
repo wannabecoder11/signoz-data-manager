@@ -130,7 +130,7 @@ server.on('request',(req, res) => {
       res.end();
     }
     if (req.url.startsWith('/api/clusters')) {
-      res.write((JSON.stringify(distinctCluster)))
+      res.write((JSON.stringify(getClusters(allRows))))
       res.end();
     }
     if (req.url.startsWith('/api/daemonsets')) {
@@ -207,9 +207,8 @@ function getDeployments(selectedClusters: Array<string>| string | undefined, all
 };
 
 
-function getClusters(selectedEnvs: Array<string>, allResources: RowJson[]): Array<string> {
-  const filteredResources = allResources.filter((resource) => selectedEnvs.includes(JSON.parse(resource.labels)["deployment.environment "]))
-  const filteredEnvs = [...new Set(filteredResources.map(obj => JSON.parse(obj.labels)["k8s.cluster.name"]))];
+function getClusters(allResources: RowJson[]): Array<string> {
+  const filteredEnvs = [...new Set(allResources.map(obj => JSON.parse(obj.labels)["k8s.cluster.name"]))];
   console.log('Filtered Envs are: ' + filteredEnvs);
 
   return filteredEnvs;
