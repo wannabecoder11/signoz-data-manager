@@ -1,0 +1,13 @@
+{
+  "extends": "./tsconfig.base.json",
+  "compilerOptions": {
+    "target": "ES2017",
+    "module": "ESNext",
+    "rootDir": "frontend/src",
+    "outDir": "frontend/dist",
+    "lib": ["DOM", "DOM.Iterable", "ES2017"],
+    "moduleResolution": "Bundler"
+  },
+  "include": ["frontend/src"],
+  "exclude": ["frontend/src/**/*.test.ts"]
+}
