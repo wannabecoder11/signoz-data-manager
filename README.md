@@ -36,5 +36,5 @@ This app allows you to view and delete specific data from your signoz database, 
 # BE
 - /api/clusters gives list of available k8s clusters
 - /api/daemonsets takes a list of clusters and returns list of daemonsets, 
-- /api/deployments takes a lsit of clusters and returns list of deployments
+- /api/deployments takes a list of clusters and returns list of deployments
 - /api/hosts returns list of hosts which don't belong to k8s cluster
