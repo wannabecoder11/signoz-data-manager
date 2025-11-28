@@ -5,7 +5,14 @@
   },
   "devDependencies": {
     "@types/node": "^24.10.1",
+    "copyfiles": "^2.4.1",
+    "nodemon": "^3.1.11",
+    "tsx": "^4.20.6",
     "typescript": "^5.9.3",
     "undici-types": "^7.16.0"
+  },
+  "scripts": {
+    "dev": "tsx watch src/*.ts",
+    "build": "tsc && copyfiles -u 1 \"src/**/*.{html,css}\" dist/"
   }
 }
