@@ -24,10 +24,10 @@ async function run() {
                       FROM signoz_logs.logs_v2_resource 
                       WHERE simpleJSONExtractString(labels, 'k8s.cluster.name') = 'test-env'
                   )
-              AND timestamp >= 1763014613000000000
-              AND timestamp <= 1763015111000000000
+              AND timestamp >= 1764231850000000000
+              AND timestamp <= 1764318250000000000
               ORDER BY timestamp ASC
-              LIMIT 10`,
+              LIMIT 3000`,
       format: 'JSONEachRow',
     });
 
@@ -77,7 +77,7 @@ async function getDistinctResources() {
     const resultSet = await client.query({
       query: `SELECT DISTINCT labels
       FROM signoz_logs.logs_v2_resource
-      Limit 3000;`,
+      Limit 10000;`,
 
       format: 'JSONEachRow',
     });

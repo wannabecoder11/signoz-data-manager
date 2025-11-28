@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Signoz Data Deleter</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+   <div class="sideBar">
+    <form action="http://localhost:3000/api/fetch" method="GET">
+
+    <div class="sideBarTitle" id="k8sType">K8s</div>
+
+        <div class="resourceKeys" hidden>Clusters</div>
+        <div class="resourceBox" id="cluster" hidden>
+        </div>
+
+         <div class="resourceKeys"  hidden>Deployments</div>
+        <div class="resourceBox" id="deploy" hidden>
+        </div>
+
+        <div class="resourceKeys"  hidden>Daemonsets</div>
+        <div class="resourceBox" id="daemon" hidden>
+        </div>
+
+
+
+    <div class="sideBarTitle" id="nonK8sType">Non-K8s</div>
+
+
+        <div class="resourceKeys" hidden>Environment</div>
+        <div class="resourceBox" id="environment" hidden>
+        </div>
+
+        <div class="resourceKeys"  hidden>Hosts</div>
+        <div class="resourceBox" id="host" hidden>
+        </div>
+        <button>Submit</button>
+    </form>
+   </div> 
+   <div class="main">
+    Main Div
+
+    </div>
+</body>
+<script src="index.js"></script>
+</html>
