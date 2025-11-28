@@ -12,15 +12,15 @@
 
     <div class="sideBarTitle" id="k8sType">K8s</div>
 
-        <div class="resourceKeys" hidden>Clusters</div>
-        <div class="resourceBox" id="cluster" hidden>
+        <div class="resourceKeys" id="clustersKeys" hidden>Clusters</div>
+        <div class="resourceBox" id="clusters" hidden>
         </div>
 
-         <div class="resourceKeys"  hidden>Deployments</div>
+         <div class="resourceKeys" id="deployKeys" hidden>Deployments</div>
         <div class="resourceBox" id="deploy" hidden>
         </div>
 
-        <div class="resourceKeys"  hidden>Daemonsets</div>
+        <div class="resourceKeys"  id="daemonKeys" hidden>Daemonsets</div>
         <div class="resourceBox" id="daemon" hidden>
         </div>
 
@@ -29,11 +29,11 @@
     <div class="sideBarTitle" id="nonK8sType">Non-K8s</div>
 
 
-        <div class="resourceKeys" hidden>Environment</div>
+        <div class="resourceKeys" id="environmentKeys"hidden>Environment</div>
         <div class="resourceBox" id="environment" hidden>
         </div>
 
-        <div class="resourceKeys"  hidden>Hosts</div>
+        <div class="resourceKeys" id="hostKeys"  hidden>Hosts</div>
         <div class="resourceBox" id="host" hidden>
         </div>
         <button>Submit</button>
