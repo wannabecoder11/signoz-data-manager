@@ -1,6 +1,9 @@
 {
   "compilerOptions": {
     "module": "nodenext",
+    "esModuleInterop": true,
+    "allowSyntheticDefaultImports": true,
+
     "moduleResolution": "nodenext",
     "target": "esnext",
     "types": [
@@ -17,6 +20,12 @@
     "isolatedModules": true,
     "noUncheckedSideEffectImports": true,
     "moduleDetection": "force",
-    "skipLibCheck": true
-  }
+    "skipLibCheck": true,
+    "outDir": "./dist",                          // Output directory for compiled JS
+    "rootDir": "./src",                          // Root directory of input files
+    "forceConsistentCasingInFileNames": true,   // Disallow inconsistently-cased imports
+  },
+  "include": ["src"],                            // Include all TS files under src
+  "exclude": ["node_modules", "dist"]            // Exclude node_modules and dist folders
+  
 }
