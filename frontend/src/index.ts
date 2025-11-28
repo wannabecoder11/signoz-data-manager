@@ -22,8 +22,36 @@ fetch('http://localhost:3000/api/distinct')
     });;
 
 function displayValues(distinctValues: string[], resrouceType: string) {
-    distinctValues.forEach(item => {
+      document.getElementById(`${resrouceType}Keys`)?.toggleAttribute("hidden")
 
+      const envDiv = document.getElementById(`${resrouceType}`);
+      if (envDiv) {
+      envDiv.replaceChildren();
+      }
+  distinctValues.forEach(item => {
+      console.log(item);
+      const envListDiv = document.createElement("div")
+      const envListInput = document.createElement("input")
+      const envListLabel = document.createElement("label")
+      envListDiv.setAttribute("class", "option")
+      envListInput.setAttribute("type", "checkbox" )
+      envListInput.setAttribute("id", item);
+      envListInput.setAttribute("name", resrouceType)
+      envListInput.setAttribute("value", item)
+      envListLabel.setAttribute("for", item)
+      if (envDiv) {
+
+        envDiv.appendChild(envListDiv)
+
+        envDiv.toggleAttribute("hidden")
+        envListLabel.innerText = item;
+        envListDiv.appendChild(envListInput)
+        envListDiv.appendChild(envListLabel)
+      }
+    })}
+function displayClusters(distinctValues: string[], resrouceType: string) {
+  document.getElementById(`${resrouceType}Keys`)?.toggleAttribute("hidden")
+  distinctValues.forEach(item => {
       const envDiv = document.getElementById(`${resrouceType}`);
       console.log(item);
       const envListDiv = document.createElement("div")
@@ -36,8 +64,9 @@ function displayValues(distinctValues: string[], resrouceType: string) {
       envListInput.setAttribute("value", item)
       envListLabel.setAttribute("for", item)
       if (envDiv) {
+        envDiv.replaceChildren();
         envDiv.appendChild(envListDiv)
-        envDiv.removeAttribute("hidden")
+        envDiv.toggleAttribute("hidden")
         envListLabel.innerText = item;
         envListDiv.appendChild(envListInput)
         envListDiv.appendChild(envListLabel)
@@ -52,10 +81,23 @@ k8sDiv?.addEventListener("click", (e) => {
       })
       .then(function(response) {
       const clusters: Array<string> = response
+
       displayValues(clusters, "clusters");
 })
-})
 
+})
+const nonK8sDiv = document.getElementById(`nonK8sType`);
+nonK8sDiv?.addEventListener("click", (e) => {
+
+  fetch('http://localhost:3000/api/hosts')
+      .then(function(response) {
+        return response.json();
+      })
+      .then(function(response) {
+      const hosts: Array<string> = response
+      displayValues(hosts, "host");
+})
+})
 
 // const envListDiv = document.createElement("div")
 // const envListInput = document.createElement("input")
