@@ -69,8 +69,8 @@ function displayClusters(distinctValues: string[], resourceType: string) {
       envListInput.setAttribute("value", item)
       envListLabel.setAttribute("for", item)
       envListInput.addEventListener("change", (e) => {
-        const checkboxes = (document.querySelectorAll(`input[name=${resourceType}:checked]`));
-        const selectedClusters =  Array.from(checkboxes).map(checkbox => checkbox.nodeValue);
+        const checkboxes = (document.querySelectorAll(`input[name=${resourceType}]:checked`));
+        const selectedClusters =  Array.from(checkboxes).map(checkbox => checkbox.getAttribute('value'));
         console.log(selectedClusters);
       })
       if (envDiv) {
