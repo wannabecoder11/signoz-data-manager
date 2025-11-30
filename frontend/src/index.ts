@@ -21,10 +21,10 @@ fetch('http://localhost:3000/api/distinct')
 
     });;
 
-function displayValues(distinctValues: string[], resrouceType: string) {
-      document.getElementById(`${resrouceType}Keys`)?.toggleAttribute("hidden")
+function displayValues(distinctValues: string[], resourceType: string) {
+      document.getElementById(`${resourceType}Keys`)?.toggleAttribute("hidden")
 
-      const envDiv = document.getElementById(`${resrouceType}`);
+      const envDiv = document.getElementById(`${resourceType}`);
       if (envDiv) {
       envDiv.replaceChildren();
       }
@@ -36,7 +36,7 @@ function displayValues(distinctValues: string[], resrouceType: string) {
       envListDiv.setAttribute("class", "option")
       envListInput.setAttribute("type", "checkbox" )
       envListInput.setAttribute("id", item);
-      envListInput.setAttribute("name", resrouceType)
+      envListInput.setAttribute("name", resourceType)
       envListInput.setAttribute("value", item)
       envListLabel.setAttribute("for", item)
       if (envDiv) {
@@ -49,29 +49,39 @@ function displayValues(distinctValues: string[], resrouceType: string) {
         envListDiv.appendChild(envListLabel)
       }
     })}
-function displayClusters(distinctValues: string[], resrouceType: string) {
-  document.getElementById(`${resrouceType}Keys`)?.toggleAttribute("hidden")
+function displayClusters(distinctValues: string[], resourceType: string) {
+  document.getElementById(`${resourceType}Keys`)?.toggleAttribute("hidden")
+  const envDiv = document.getElementById(`${resourceType}`);
+  if (envDiv) {
+      envDiv.replaceChildren();
+      envDiv.toggleAttribute("hidden")
+  }
   distinctValues.forEach(item => {
-      const envDiv = document.getElementById(`${resrouceType}`);
-      console.log(item);
+      // const envDiv = document.getElementById(`${resourceType}`);
+      // console.log(item);
       const envListDiv = document.createElement("div")
       const envListInput = document.createElement("input")
       const envListLabel = document.createElement("label")
       envListDiv.setAttribute("class", "option")
       envListInput.setAttribute("type", "checkbox" )
       envListInput.setAttribute("id", item);
-      envListInput.setAttribute("name", resrouceType)
+      envListInput.setAttribute("name", resourceType)
       envListInput.setAttribute("value", item)
       envListLabel.setAttribute("for", item)
+      envListInput.addEventListener("change", (e) => {
+        const checkboxes = (document.querySelectorAll(`input[name=${resourceType}:checked]`));
+        const selectedClusters =  Array.from(checkboxes).map(checkbox => checkbox.nodeValue);
+        console.log(selectedClusters);
+      })
       if (envDiv) {
-        envDiv.replaceChildren();
+        // envDiv.replaceChildren();
         envDiv.appendChild(envListDiv)
-        envDiv.toggleAttribute("hidden")
         envListLabel.innerText = item;
         envListDiv.appendChild(envListInput)
         envListDiv.appendChild(envListLabel)
       }
     })}
+
 const k8sDiv = document.getElementById(`k8sType`);
 k8sDiv?.addEventListener("click", (e) => {
 
@@ -81,8 +91,8 @@ k8sDiv?.addEventListener("click", (e) => {
       })
       .then(function(response) {
       const clusters: Array<string> = response
-
-      displayValues(clusters, "clusters");
+      console.log("The list of clusters are " + clusters)
+      displayClusters(clusters, "clusters");
 })
 
 })
