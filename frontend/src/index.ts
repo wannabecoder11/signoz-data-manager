@@ -1,8 +1,3 @@
-
-
-
-
-
 let getDistinctResources 
 
 fetch('http://localhost:3000/api/distinct')
@@ -22,7 +17,7 @@ fetch('http://localhost:3000/api/distinct')
     });;
 
 function displayValues(distinctValues: string[], resourceType: string) {
-      document.getElementById(`${resourceType}Keys`)?.toggleAttribute("hidden")
+      document.getElementById(`${resourceType}Keys`)?.removeAttribute("hidden")
 
       const envDiv = document.getElementById(`${resourceType}`);
       if (envDiv) {
@@ -43,18 +38,21 @@ function displayValues(distinctValues: string[], resourceType: string) {
 
         envDiv.appendChild(envListDiv)
 
-        envDiv.toggleAttribute("hidden")
+        envDiv.removeAttribute("hidden")
         envListLabel.innerText = item;
         envListDiv.appendChild(envListInput)
         envListDiv.appendChild(envListLabel)
       }
     })}
+
+
+
 function displayClusters(distinctValues: string[], resourceType: string) {
   document.getElementById(`${resourceType}Keys`)?.toggleAttribute("hidden")
   const envDiv = document.getElementById(`${resourceType}`);
   if (envDiv) {
       envDiv.replaceChildren();
-      envDiv.toggleAttribute("hidden")
+      envDiv.removeAttribute("hidden")
   }
   distinctValues.forEach(item => {
       // const envDiv = document.getElementById(`${resourceType}`);
@@ -69,9 +67,41 @@ function displayClusters(distinctValues: string[], resourceType: string) {
       envListInput.setAttribute("value", item)
       envListLabel.setAttribute("for", item)
       envListInput.addEventListener("change", (e) => {
-        const checkboxes = (document.querySelectorAll(`input[name=${resourceType}]:checked`));
-        const selectedClusters =  Array.from(checkboxes).map(checkbox => checkbox.getAttribute('value'));
-        console.log(selectedClusters);
+        const checkedboxes = (document.querySelectorAll(`input[name=${resourceType}]:checked`));
+        const selectedClusters =  Array.from(checkedboxes).map(checkbox => checkbox.getAttribute('value'));
+        // console.log(selectedClusters);
+        // fetch daemonsets for the above cluster and display it using displayValues func
+        const daemonsetUrl = new URL('http://localhost:3000/api/daemonsets');
+        for (let i in selectedClusters) {
+          daemonsetUrl.searchParams.append('clusters', `${selectedClusters[i]}`);
+        }
+
+        fetch(daemonsetUrl.href)
+        .then(function(response) {
+          return response.json();
+        }).then(function(response) { 
+          const clusters: Array<string> = response
+          displayValues(clusters, "daemon")
+        });
+
+        // fetch deployments for the above clusters and display it
+        const deploymentUrl = new URL('http://localhost:3000/api/deployments');
+        for (let i in selectedClusters) {
+          deploymentUrl.searchParams.append('clusters', `${selectedClusters[i]}`);
+        }
+
+        fetch(deploymentUrl.href)
+        .then(function(response) {
+
+          return response.json();
+        }).then(function(response) { 
+
+          console.log('the deployments response is' + response)
+          const clusters: Array<string> = response
+          displayValues(clusters, "deploy")
+        });
+
+
       })
       if (envDiv) {
         // envDiv.replaceChildren();
