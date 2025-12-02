@@ -72,6 +72,80 @@ interface RowJson {
 
 let allRows: RowJson[]
 
+
+
+const server = http.createServer()
+
+server.on('request', (req, res) => {
+  if (req.url) {
+    const parsedURL = url.parse(req.url, true);
+    const pathname = parsedURL.pathname;
+    const query = parsedURL.query;
+
+    if (req.url.startsWith('/api')) {
+      // if (req.url === '/api/distinct') {
+      //   res.write(JSON.stringify({ distinctEnv, distinctHost, distinctDeploy, distinctDaemon, distinctCluster }))
+      //   res.end();
+      // }
+      if (req.url.startsWith('/api/fetch')) {
+        console.log(query)
+        res.end();
+      }
+      if (req.url.startsWith('/api/clusters')) {
+        res.write((JSON.stringify(getClusters(allRows))))
+        res.end();
+      }
+      if (req.url.startsWith('/api/daemonsets')) {
+        console.log(query)
+        res.write((JSON.stringify(getDaemonSets(query.clusters, allRows))))
+        res.end();
+      }
+      if (req.url.startsWith('/api/deployments')) {
+        console.log(JSON.stringify(query))
+        res.write((JSON.stringify(getDeployments(query.clusters, allRows))))
+        res.end();
+      }
+      if (req.url.startsWith('/api/hosts')) {
+        console.log(query)
+        res.write((JSON.stringify(getHosts(allRows))))
+        res.end();
+      }
+
+    } else {     // Only serve index.html for the root path
+      const filePath = req.url === '/' ? '/index.html' : req.url;
+
+      const extname = String(path.extname(filePath)).toLowerCase();
+      const mimeTypes: Record<string, string> = {
+        '.html': 'text/html',
+        '.js': 'application/javascript',
+        '.css': 'text/css',
+        '.json': 'application/json',
+        '.png': 'image/png',
+        '.jpg': 'image/jpg',
+        '.gif': 'image/gif',
+        '.svg': 'image/svg+xml',
+      };
+
+      const contentType: string = mimeTypes[extname] || 'application/octet-stream';
+
+
+      fs.readFile(path.join(__dirname, "../../frontend/dist", filePath), (error, content) => {
+        if (error) {
+          res.writeHead(404);
+          res.end('File not found');
+        } else {
+          res.writeHead(200, { 'Content-Type': contentType });
+          res.end(content);
+        }
+      });
+    }
+  }
+});
+
+getDistinctResources().catch(console.error);
+server.listen(3000);
+console.log('Listening on Port 3000');
+
 async function getDistinctResources() {
   try {
     const resultSet = await client.query({
@@ -111,100 +185,32 @@ async function getDistinctResources() {
     console.error('Query error:', err);
   }
 }
-getDistinctResources().catch(console.error);
-
-const server = http.createServer()
-server.on('request',(req, res) => {
-  if (req.url) {
-  const parsedURL = url.parse(req.url, true);
-  const pathname = parsedURL.pathname;
-  const query = parsedURL.query;
-   
-  if (req.url.startsWith('/api')) {
-    // if (req.url === '/api/distinct') {
-    //   res.write(JSON.stringify({ distinctEnv, distinctHost, distinctDeploy, distinctDaemon, distinctCluster }))
-    //   res.end();
-    // }
-    if (req.url.startsWith('/api/fetch')) {
-      console.log(query)
-      res.end();
-    }
-    if (req.url.startsWith('/api/clusters')) {
-      res.write((JSON.stringify(getClusters(allRows))))
-      res.end();
-    }
-    if (req.url.startsWith('/api/daemonsets')) {
-      console.log(query)
-        res.write((JSON.stringify(getDaemonSets(query.clusters, allRows))))
-      res.end();
-    }
-    if (req.url.startsWith('/api/deployments')) {
-      console.log(JSON.stringify(query))
-      res.write((JSON.stringify(getDeployments(query.clusters, allRows))))
-      res.end();
-    }
-    if (req.url.startsWith('/api/hosts')) {
-      console.log(query)
-      res.write((JSON.stringify(getHosts(allRows))))
-      res.end();
-    }
-
-  } else {     // Only serve index.html for the root path
-    const filePath = req.url === '/' ? '/index.html' : req.url;
-
-    const extname = String(path.extname(filePath)).toLowerCase();
-    const mimeTypes: Record<string, string> = {
-      '.html': 'text/html',
-      '.js': 'application/javascript',
-      '.css': 'text/css',
-      '.json': 'application/json',
-      '.png': 'image/png',
-      '.jpg': 'image/jpg',
-      '.gif': 'image/gif',
-      '.svg': 'image/svg+xml',
-    };
-
-    const contentType: string =  mimeTypes[extname] || 'application/octet-stream';
 
 
-    fs.readFile(path.join(__dirname, "../../frontend/dist", filePath), (error, content) => {
-      if (error) {
-        res.writeHead(404);
-        res.end('File not found');
-      } else {
-        res.writeHead(200, { 'Content-Type': contentType });
-        res.end(content);
-      }
-    });
+
+function getDaemonSets(selectedClusters: Array<string> | string | undefined, allResources: RowJson[]): Array<string> {
+  if (Array.isArray(selectedClusters) || (typeof (selectedClusters) === 'string')) {
+    const filteredResources = allResources.filter((resource) => selectedClusters.includes(JSON.parse(resource.labels)["k8s.cluster.name"]))
+    const filteredDaemon = [...new Set(filteredResources.map(obj => JSON.parse(obj.labels)["k8s.daemonset.name"]))];
+    console.log('Filtered daemonsets are' + filteredDaemon);
+    return filteredDaemon;
+  } else {
+    console.log(typeof (selectedClusters))
+    return []
   }
-  }
-});
+  ;
+}
+function getDeployments(selectedClusters: Array<string> | string | undefined, allResources: RowJson[]): Array<string> {
+  if (Array.isArray(selectedClusters) || (typeof (selectedClusters) === 'string')) {
 
-server.listen(3000);
-console.log('Listening on Port 3000');
+    const filteredResources = allResources.filter((resource) => selectedClusters.includes(JSON.parse(resource.labels)["k8s.cluster.name"]))
+    const filteredDeployments = [...new Set(filteredResources.map(obj => JSON.parse(obj.labels)["k8s.deployment.name"]))];
+    console.log('Filtered deployments are' + filteredDeployments);
 
-function getDaemonSets(selectedClusters: Array<string>| string | undefined, allResources: RowJson[]): Array<string> {
-  if (Array.isArray(selectedClusters) || (typeof(selectedClusters) === 'string')) {
-      const filteredResources = allResources.filter((resource) => selectedClusters.includes(JSON.parse(resource.labels)["k8s.cluster.name"]))
-      const filteredDaemon = [...new Set(filteredResources.map(obj => JSON.parse(obj.labels)["k8s.daemonset.name"]))];
-      console.log('Filtered daemonsets are' + filteredDaemon);
-      return filteredDaemon;
-  } else  {
-    console.log(typeof(selectedClusters))
-      return [] 
-  }
-;}
-function getDeployments(selectedClusters: Array<string>| string | undefined, allResources: RowJson[]): Array<string> {
-  if (Array.isArray(selectedClusters) || (typeof(selectedClusters) === 'string')) {
-
-  const filteredResources = allResources.filter((resource) => selectedClusters.includes(JSON.parse(resource.labels)["k8s.cluster.name"]))
-  const filteredDeployments = [...new Set(filteredResources.map(obj => JSON.parse(obj.labels)["k8s.deployment.name"]))];
-  console.log('Filtered deployments are' + filteredDeployments);
-
-  return filteredDeployments;
-  } else  {
-    console.log(typeof(selectedClusters))
-      return [] 
+    return filteredDeployments;
+  } else {
+    console.log(typeof (selectedClusters))
+    return []
   }
 };
 
