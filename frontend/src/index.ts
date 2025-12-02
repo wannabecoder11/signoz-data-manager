@@ -54,6 +54,8 @@ function displayClusters(distinctValues: string[], resourceType: string) {
       envDiv.replaceChildren();
       envDiv.removeAttribute("hidden")
   }
+
+  // display the list of k8s clusters
   distinctValues.forEach(item => {
       // const envDiv = document.getElementById(`${resourceType}`);
       // console.log(item);
@@ -67,41 +69,8 @@ function displayClusters(distinctValues: string[], resourceType: string) {
       envListInput.setAttribute("value", item)
       envListLabel.setAttribute("for", item)
       envListInput.addEventListener("change", (e) => {
-        const checkedboxes = (document.querySelectorAll(`input[name=${resourceType}]:checked`));
-        const selectedClusters =  Array.from(checkedboxes).map(checkbox => checkbox.getAttribute('value'));
-        // console.log(selectedClusters);
-        // fetch daemonsets for the above cluster and display it using displayValues func
-        const daemonsetUrl = new URL('http://localhost:3000/api/daemonsets');
-        for (let i in selectedClusters) {
-          daemonsetUrl.searchParams.append('clusters', `${selectedClusters[i]}`);
-        }
-
-        fetch(daemonsetUrl.href)
-        .then(function(response) {
-          return response.json();
-        }).then(function(response) { 
-          const clusters: Array<string> = response
-          displayValues(clusters, "daemon")
-        });
-
-        // fetch deployments for the above clusters and display it
-        const deploymentUrl = new URL('http://localhost:3000/api/deployments');
-        for (let i in selectedClusters) {
-          deploymentUrl.searchParams.append('clusters', `${selectedClusters[i]}`);
-        }
-
-        fetch(deploymentUrl.href)
-        .then(function(response) {
-
-          return response.json();
-        }).then(function(response) { 
-
-          console.log('the deployments response is' + response)
-          const clusters: Array<string> = response
-          displayValues(clusters, "deploy")
-        });
-
-
+          fetchK8sResources('daemonsets')
+          // fetchK8sResources('deployments')
       })
       if (envDiv) {
         // envDiv.replaceChildren();
@@ -126,6 +95,9 @@ k8sDiv?.addEventListener("click", (e) => {
 })
 
 })
+
+
+
 const nonK8sDiv = document.getElementById(`nonK8sType`);
 nonK8sDiv?.addEventListener("click", (e) => {
 
@@ -154,3 +126,60 @@ nonK8sDiv?.addEventListener("click", (e) => {
 // envListDiv.appendChild(envListLabel)
 // envListDiv.onclick 
 
+function displayList(distinctValues: string[], resourceType: string) {
+      // document.getElementById(`${resourceType}Keys`)?.removeAttribute("hidden")
+
+      const envDiv = document.getElementById(`${resourceType}`);
+      if (envDiv) {
+          envDiv.replaceChildren();
+      }
+      distinctValues.forEach(item => {
+        console.log(item);
+        const envListDiv = document.createElement("div")
+        const envListInput = document.createElement("input")
+        const envListLabel = document.createElement("label")
+        envListDiv.setAttribute("class", "option")
+        envListInput.setAttribute("type", "checkbox" )
+        envListInput.setAttribute("id", item);
+        envListInput.setAttribute("name", resourceType)
+        envListInput.setAttribute("value", item)
+        envListLabel.setAttribute("for", item)
+        if (envDiv) {
+
+          envDiv.appendChild(envListDiv)
+
+          // envDiv.removeAttribute("hidden")
+          envListLabel.innerText = item;
+          envListDiv.appendChild(envListInput)
+          envListDiv.appendChild(envListLabel)
+        }
+      })}
+
+function fetchK8sResources(resourceType: string) {
+        const checkedboxes = (document.querySelectorAll(`input[name=clusters]:checked`));
+        const selectedClusters =  Array.from(checkedboxes).map(checkbox => checkbox.getAttribute('value'));
+        // console.log(selectedClusters);
+
+        // fetch daemonsets/deployments for the above cluster and display it using displayList func
+        const endpointUrl = new URL(`http://localhost:3000/api/${resourceType}`);
+        for (let i in selectedClusters) {
+          endpointUrl.searchParams.append('clusters', `${selectedClusters[i]}`);
+        }
+        fetch(endpointUrl.href)
+          .then(response => {
+            if (!response.ok) {
+              throw new Error(`HTTP error! status: ${response.status}`);
+            }
+            return response.json();  // Return this promise chain here
+          })
+          .then(data => {
+            // console.log('the deployments response is', data);
+            displayList(data, "deploy");
+          })
+          .catch(error => {
+            console.error('Fetch error:', error);
+          });
+
+
+
+      }
