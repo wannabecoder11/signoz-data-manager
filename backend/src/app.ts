@@ -190,6 +190,7 @@ function getDaemonSets(selectedClusters: Array<string>| string | undefined, allR
       console.log('Filtered daemonsets are' + filteredDaemon);
       return filteredDaemon;
   } else  {
+    console.log(typeof(selectedClusters))
       return [] 
   }
 ;}

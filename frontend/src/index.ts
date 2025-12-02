@@ -17,14 +17,14 @@ fetch('http://localhost:3000/api/distinct')
     });;
 
 function displayValues(distinctValues: string[], resourceType: string) {
-      document.getElementById(`${resourceType}Keys`)?.removeAttribute("hidden")
+      document.getElementById(`${resourceType}Keys`)?.toggleAttribute("hidden")
 
       const envDiv = document.getElementById(`${resourceType}`);
       if (envDiv) {
       envDiv.replaceChildren();
       }
   distinctValues.forEach(item => {
-      console.log(item);
+      // console.log(item);
       const envListDiv = document.createElement("div")
       const envListInput = document.createElement("input")
       const envListLabel = document.createElement("label")
@@ -48,7 +48,10 @@ function displayValues(distinctValues: string[], resourceType: string) {
 
 
 function displayClusters(distinctValues: string[], resourceType: string) {
-  document.getElementById(`${resourceType}Keys`)?.toggleAttribute("hidden")
+  document.getElementById(`${resourceType}Keys`)?.toggleAttribute("hidden");
+  document.getElementById(`deploymentsKeys`)?.toggleAttribute("hidden"); // show deployment heading
+  document.getElementById(`daemonsetsKeys`)?.toggleAttribute("hidden"); // show daemonset heading
+
   const envDiv = document.getElementById(`${resourceType}`);
   if (envDiv) {
       envDiv.replaceChildren();
@@ -70,7 +73,7 @@ function displayClusters(distinctValues: string[], resourceType: string) {
       envListLabel.setAttribute("for", item)
       envListInput.addEventListener("change", (e) => {
           fetchK8sResources('daemonsets')
-          // fetchK8sResources('deployments')
+          fetchK8sResources('deployments')
       })
       if (envDiv) {
         // envDiv.replaceChildren();
@@ -90,7 +93,7 @@ k8sDiv?.addEventListener("click", (e) => {
       })
       .then(function(response) {
       const clusters: Array<string> = response
-      console.log("The list of clusters are " + clusters)
+      // console.log("The list of clusters are " + clusters)
       displayClusters(clusters, "clusters");
 })
 
@@ -134,7 +137,7 @@ function displayList(distinctValues: string[], resourceType: string) {
           envDiv.replaceChildren();
       }
       distinctValues.forEach(item => {
-        console.log(item);
+        // console.log(item);
         const envListDiv = document.createElement("div")
         const envListInput = document.createElement("input")
         const envListLabel = document.createElement("label")
@@ -174,7 +177,7 @@ function fetchK8sResources(resourceType: string) {
           })
           .then(data => {
             // console.log('the deployments response is', data);
-            displayList(data, "deploy");
+            displayList(data, resourceType);
           })
           .catch(error => {
             console.error('Fetch error:', error);
