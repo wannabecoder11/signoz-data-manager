@@ -184,7 +184,7 @@ server.listen(3000);
 console.log('Listening on Port 3000');
 
 function getDaemonSets(selectedClusters: Array<string>| string | undefined, allResources: RowJson[]): Array<string> {
-  if (Array.isArray(selectedClusters) || isStringObject(selectedClusters)) {
+  if (Array.isArray(selectedClusters) || (typeof(selectedClusters) === 'string')) {
       const filteredResources = allResources.filter((resource) => selectedClusters.includes(JSON.parse(resource.labels)["k8s.cluster.name"]))
       const filteredDaemon = [...new Set(filteredResources.map(obj => JSON.parse(obj.labels)["k8s.daemonset.name"]))];
       console.log('Filtered daemonsets are' + filteredDaemon);
@@ -194,7 +194,7 @@ function getDaemonSets(selectedClusters: Array<string>| string | undefined, allR
   }
 ;}
 function getDeployments(selectedClusters: Array<string>| string | undefined, allResources: RowJson[]): Array<string> {
-  if (Array.isArray(selectedClusters) || isStringObject(selectedClusters)) {
+  if (Array.isArray(selectedClusters) || (typeof(selectedClusters) === 'string')) {
 
   const filteredResources = allResources.filter((resource) => selectedClusters.includes(JSON.parse(resource.labels)["k8s.cluster.name"]))
   const filteredDeployments = [...new Set(filteredResources.map(obj => JSON.parse(obj.labels)["k8s.deployment.name"]))];
@@ -202,6 +202,7 @@ function getDeployments(selectedClusters: Array<string>| string | undefined, all
 
   return filteredDeployments;
   } else  {
+    console.log(typeof(selectedClusters))
       return [] 
   }
 };
