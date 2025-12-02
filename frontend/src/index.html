@@ -1,54 +1,63 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Signoz Data Deleter</title>
     <link rel="stylesheet" href="style.css">
 </head>
+
 <body>
-   <div class="sideBar">
-    <form action="http://localhost:3000/api/fetch" method="GET">
+    <div class="sideBar">
+        <form action="http://localhost:3000/api/fetch" method="GET">
+            <div class="sideBarTitle">Time Period</div>
+            <div class="resourceKeys">
+                <label for="fromDate">From Date</label>
+                <input type="date" id="fromDate">
+                <label for="toDate">To Date</label>
+                <input type="date" id="toDate">
+            </div>
 
-    <div class="sideBarTitle" id="k8sType">K8s</div>
+            <div class="sideBarTitle" id="k8sType">K8s</div>
 
-        <div  id="clustersKeys" hidden>
-            <div class="resourceKeys">Clusters</div>    
-            <div class="resourceBox" id="clusters" hidden>
-        </div>
-        </div>
-        <div id="deploymentsKeys" hidden>
-            <div class="resourceKeys" >Deployments</div>   
-            <div class="resourceBox" id="deployments" >
-        </div>
-        </div>
+            <div id="clustersKeys" hidden>
+                <div class="resourceKeys">Clusters</div>
+                <div class="resourceBox" id="clusters" hidden>
+                </div>
+            </div>
+            <div id="deploymentsKeys" hidden>
+                <div class="resourceKeys">Deployments</div>
+                <div class="resourceBox" id="deployments">
+                </div>
+            </div>
 
-        <div  id="daemonsetsKeys" hidden>
-        <div class="resourceKeys">Daemonsets</div>
-        <div class="resourceBox" id="daemonsets" >
-        </div>
-        </div>
-
-
-    <div class="sideBarTitle" id="nonK8sType">Non-K8s</div>
+            <div id="daemonsetsKeys" hidden>
+                <div class="resourceKeys">Daemonsets</div>
+                <div class="resourceBox" id="daemonsets">
+                </div>
+            </div>
 
 
-        <div class="resourceKeys" id="environmentKeys"hidden>Environment</div>
-        <div class="resourceBox" id="environment" hidden>
-        </div>
+            <div class="sideBarTitle" id="nonK8sType">Non-K8s</div>
 
-        <div id="hostKeys"  hidden>
-        <div class="resourceKeys">Hosts</div>
-        <div class="resourceBox" id="host" >
-        </div>
-        </div>
-        <button>Submit</button>
-    </form>
-   </div> 
-   <div class="main">
-    Main Div
 
+            <div class="resourceKeys" id="environmentKeys" hidden>Environment</div>
+            <div class="resourceBox" id="environment" hidden>
+            </div>
+
+            <div id="hostKeys" hidden>
+                <div class="resourceKeys">Hosts</div>
+                <div class="resourceBox" id="host">
+                </div>
+            </div>
+            <button>Submit</button>
+        </form>
+    </div>
+    <div class="main">
+        Main Div
     </div>
 </body>
 <script src="index.js"></script>
+
 </html>

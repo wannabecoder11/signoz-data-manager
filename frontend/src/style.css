@@ -56,7 +56,7 @@ body {
 
 .main {
     width: 73vw;
-    height: 100vw;
+    /* height: 100vw; */
     border-style: dotted;
     display: felxbox;
     flex-wrap: wrap;
@@ -64,4 +64,8 @@ body {
     margin: 2px;
     border-radius: 7px;
 
+    .topbar {
+        height: 2rem;
+        background-color: blueviolet;
+    }
 }
