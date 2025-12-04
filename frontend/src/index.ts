@@ -122,3 +122,9 @@ nonK8sDiv?.addEventListener("click", (e) => {
 })
 })
 
+// const submitButton = document.getElementById('submitButton');
+// submitButton?.addEventListener("click", (e) => {
+//   e.preventDefault();
+//   let d = Date.parse(document.getElementById('fromDate').value)
+//   console.log(d)
+// })
