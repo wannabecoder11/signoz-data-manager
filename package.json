@@ -1,7 +1,8 @@
 {
   "dependencies": {
     "@clickhouse/client": "^1.13.0",
-    "undici": "^7.16.0"
+    "undici": "^7.16.0",
+    "zod": "^4.1.13"
   },
   "devDependencies": {
     "@types/node": "^24.10.1",
