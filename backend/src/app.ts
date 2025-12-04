@@ -123,7 +123,23 @@ function getHosts(allResources: RowJson[]) {
   return filteredHosts;
 };
 
-async function getLogs(labelValueString: queryParm, labelKeyString: labelKeyString, fromDate: queryParm, toDate: queryParm) {
+function makeSqlArray(a: string | string[] | undefined) {
+  if (Array.isArray(a) || (typeof (a) === 'string')) {
+    try {
+      let labelValueSQL: string[] | string
+      if (Array.isArray(a)) {
+        labelValueSQL = `${a.join("','")}`
+      } else {
+        labelValueSQL = `${a}`;
+      }
+      return labelValueSQL; 
+    } catch(err) {
+      console.log(`Error in converting to SQL Array: ${err}`)
+    }
+  }
+}
+
+async function getLogs(labelValueString: queryParm, labelKeyString: labelKeyString, fromDate: queryParm, toDate: queryParm, logLevel: queryParm, statusCode: queryParm) {
 
   // schema validation for dates
   const parsedFromDate = dateSchema.safeParse(fromDate);
@@ -134,27 +150,24 @@ async function getLogs(labelValueString: queryParm, labelKeyString: labelKeyStri
   if (!parsedToDate.success) {
     throw new Error(`Invalid toDate: ${parsedToDate.error.message}`);
   }
+  
+  let logLevelSQL = makeSqlArray(logLevel)
+  let statusCodeSQL = `${makeSqlArray(statusCode)}`
+  let labelValueSQL = makeSqlArray(labelValueString);
+  let labelKeySQL = makeSqlArray(labelKeyString)
 
-
-  if (Array.isArray(labelValueString) || (typeof (labelValueString) === 'string')) {
-    try {
-      let sqlInString: string[] | string
-      if (Array.isArray(labelValueString)) {
-        sqlInString = `${labelValueString.join("','")}`
-      } else {
-        sqlInString = `${labelValueString}`;
-      }
-      console.log(`sql string is '${sqlInString}'`)
-      const first4logs = await client.query({
+  const first4logs = await client.query({
         query: `SELECT * FROM signoz_logs.logs_v2
                 WHERE
                      resource_fingerprint IN (
                           SELECT fingerprint
                           FROM signoz_logs.logs_v2_resource
-                          WHERE simpleJSONExtractString(labels, '${labelKeyString}') in ('${sqlInString}')
+                          WHERE simpleJSONExtractString(labels, '${labelKeySQL}') in ('${labelValueSQL}')
                        )
                 AND ts_bucket_start <= ${parsedToDate.data.getTime()/1000} --current date in epoch seconds
                 AND ts_bucket_start >= ${parsedFromDate.data.getTime()/1000} --current date
+                ${logLevel ? `AND attributes_string['level'] in (${logLevelSQL})` : ''}
+                ${statusCode ? `AND attributes_number['status'] in (${statusCodeSQL})` : ''}
                 ORDER BY timestamp ASC
                 LIMIT 4`,
         format: 'JSONEachRow',
@@ -165,10 +178,12 @@ async function getLogs(labelValueString: queryParm, labelKeyString: labelKeyStri
                      resource_fingerprint IN (
                           SELECT fingerprint
                           FROM signoz_logs.logs_v2_resource
-                          WHERE simpleJSONExtractString(labels, '${labelKeyString}') in ('${sqlInString}')
+                          WHERE simpleJSONExtractString(labels, '${labelKeySQL}') in ('${labelValueSQL}')
                        )
                 AND ts_bucket_start <= ${parsedToDate.data.getTime()/1000} --current date
                 AND ts_bucket_start >= ${parsedFromDate.data.getTime()/1000} --current date
+                ${logLevel ? `AND attributes_string['level'] in (${logLevelSQL})` : ''}
+                ${statusCode ? `AND attributes_number['status'] in (${statusCodeSQL})` : ''}
                 ORDER BY timestamp DESC
                 LIMIT 4`,
         format: 'JSONEachRow',
@@ -180,13 +195,7 @@ async function getLogs(labelValueString: queryParm, labelKeyString: labelKeyStri
 
       return { parsedfirst4logs, parsedlast4logs };
 
-    } catch (err) {
-      console.error('Query error:', err);
-    }
-  } else {
-    console.log(`Error response is of unacceptable type`);
-  }
-};
+    };
 const server = http.createServer()
 
 server.on('request', (req, res) => {
@@ -228,7 +237,7 @@ server.on('request', (req, res) => {
         console.log(`The list of hosts recived ${query.host} `);
         console.log('calling getHostLogs function');
 
-        getLogs(query.host, "host.name", query.fromDate, query.toDate).then((e) => {
+        getLogs(query.host, "host.name", query.fromDate, query.toDate, query.level, query.status).then((e) => {
           res.write((JSON.stringify(e)))
           res.end();
         })
@@ -238,7 +247,7 @@ server.on('request', (req, res) => {
         console.log(`The list of daemonsets recived ${query.daemonsets} `);
         console.log('calling getLogs function');
 
-        getLogs(query.daemonsets, "k8s.daemonset.name", query.fromDate, query.toDate).then((e) => {
+        getLogs(query.daemonsets, "k8s.daemonset.name", query.fromDate, query.toDate, query.level, query.status).then((e) => {
           res.write((JSON.stringify(e)))
           res.end();
         })
@@ -248,7 +257,7 @@ server.on('request', (req, res) => {
         console.log(`The list of deployments recived ${query.deployments} `);
         console.log('calling getLogs function');
 
-        getLogs(query.deployments, "k8s.deployment.name", query.fromDate, query.toDate).then((e) => {
+        getLogs(query.deployments, "k8s.deployment.name", query.fromDate, query.toDate, query.level, query.status).then((e) => {
           res.write((JSON.stringify(e)))
           res.end();
         })
