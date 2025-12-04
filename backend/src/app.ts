@@ -54,6 +54,61 @@ async function run() {
     console.error('Query error:', err);
   }
 }
+// function to fetch logs for  hosts
+
+
+async function getHostLogs(hosts: Array<string> | string | undefined) {
+  if (Array.isArray(hosts) || (typeof (hosts) === 'string')) {
+    try {
+      let sqlInString: string[] | string
+      if (Array.isArray(hosts)) {
+        sqlInString = `${hosts.join("','")}`
+      } else {
+        sqlInString = `${hosts}`;
+      }
+      console.log(`sql string is '${sqlInString}'`)
+      const first4logs = await client.query({
+        query: `SELECT * FROM signoz_logs.logs_v2
+                WHERE
+                     resource_fingerprint IN (
+                          SELECT fingerprint
+                          FROM signoz_logs.logs_v2_resource
+                          WHERE simpleJSONExtractString(labels, 'host.name') in ('${sqlInString}')
+                       )
+                AND ts_bucket_start <= 1764684622 --current date
+                AND ts_bucket_start >= 1762089143 --current date
+                ORDER BY timestamp ASC
+                LIMIT 4`,
+        format: 'JSONEachRow',
+      });
+      const last4logs = await client.query({
+        query: `SELECT * FROM signoz_logs.logs_v2
+                WHERE
+                     resource_fingerprint IN (
+                          SELECT fingerprint
+                          FROM signoz_logs.logs_v2_resource
+                          WHERE simpleJSONExtractString(labels, 'host.name') in ('${sqlInString}')
+                       )
+                AND ts_bucket_start <= 1764684622 --current date
+                AND ts_bucket_start >= 1762089143 --current date
+                ORDER BY timestamp DESC
+                LIMIT 4`,
+        format: 'JSONEachRow',
+      });
+
+      // fetch all results as JSON array
+      const parsedfirst4logs = await first4logs.json();
+      const parsedlast4logs = await last4logs.json();
+
+      return { parsedfirst4logs, parsedlast4logs };
+
+    } catch (err) {
+      console.error('Query error:', err);
+    }
+  } else {
+    console.log(`Error response is of unacceptable type`);
+  }
+};
 
 
 
@@ -110,6 +165,16 @@ server.on('request', (req, res) => {
         res.write((JSON.stringify(getHosts(allRows))))
         res.end();
       }
+      if (req.url.startsWith('/api/hostlogs')) {
+        console.log(`The list of hosts recived ${query.host} `);
+        console.log('calling getHostLogs function');
+
+        getHostLogs(query.host).then((e) => {
+          res.write((JSON.stringify(e)))
+          res.end();
+        })
+
+      }
 
     } else {     // Only serve index.html for the root path
       const filePath = req.url === '/' ? '/index.html' : req.url;
@@ -151,7 +216,7 @@ async function getDistinctResources() {
     const resultSet = await client.query({
       query: `SELECT DISTINCT labels
       FROM signoz_logs.logs_v2_resource
-      Limit 10000;`,
+      Limit 10000; `,
 
       format: 'JSONEachRow',
     });
@@ -172,11 +237,11 @@ async function getDistinctResources() {
     // distinctDaemon = [...new Set(allRows.map(obj => JSON.parse(obj.labels)["k8s.daemonset.name"]))];
     distinctCluster = [...new Set(allRows.map(obj => JSON.parse(obj.labels)["k8s.cluster.name"]))];
     console.log('Fetching resouces complete')
-    // console.log(`distinct envs are ${distinctEnv}`); // allRows is an array of row objects
-    // console.log(`distinct Hosts are ${distinctHost}`); // allRows is an array of row objects
-    // console.log(`distinct Deployments are ${distinctDeploy}`); // allRows is an array of row objects
-    // console.log(`distinct Daemonsets are ${distinctDaemon}`); // allRows is an array of row objects
-    // console.log(`distinct Clusters are ${distinctCluster}`); // allRows is an array of row objects
+    // console.log(`distinct envs are ${ distinctEnv } `); // allRows is an array of row objects
+    // console.log(`distinct Hosts are ${ distinctHost } `); // allRows is an array of row objects
+    // console.log(`distinct Deployments are ${ distinctDeploy } `); // allRows is an array of row objects
+    // console.log(`distinct Daemonsets are ${ distinctDaemon } `); // allRows is an array of row objects
+    // console.log(`distinct Clusters are ${ distinctCluster } `); // allRows is an array of row objects
 
     getDaemonSets(["trg-env"], allRows)
     getDeployments(["trg-env"], allRows)
