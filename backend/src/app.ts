@@ -54,61 +54,8 @@ async function run() {
     console.error('Query error:', err);
   }
 }
-// function to fetch logs for  hosts
 
-
-async function getHostLogs(hosts: Array<string> | string | undefined) {
-  if (Array.isArray(hosts) || (typeof (hosts) === 'string')) {
-    try {
-      let sqlInString: string[] | string
-      if (Array.isArray(hosts)) {
-        sqlInString = `${hosts.join("','")}`
-      } else {
-        sqlInString = `${hosts}`;
-      }
-      console.log(`sql string is '${sqlInString}'`)
-      const first4logs = await client.query({
-        query: `SELECT * FROM signoz_logs.logs_v2
-                WHERE
-                     resource_fingerprint IN (
-                          SELECT fingerprint
-                          FROM signoz_logs.logs_v2_resource
-                          WHERE simpleJSONExtractString(labels, 'host.name') in ('${sqlInString}')
-                       )
-                AND ts_bucket_start <= 1764684622 --current date
-                AND ts_bucket_start >= 1762089143 --current date
-                ORDER BY timestamp ASC
-                LIMIT 4`,
-        format: 'JSONEachRow',
-      });
-      const last4logs = await client.query({
-        query: `SELECT * FROM signoz_logs.logs_v2
-                WHERE
-                     resource_fingerprint IN (
-                          SELECT fingerprint
-                          FROM signoz_logs.logs_v2_resource
-                          WHERE simpleJSONExtractString(labels, 'host.name') in ('${sqlInString}')
-                       )
-                AND ts_bucket_start <= 1764684622 --current date
-                AND ts_bucket_start >= 1762089143 --current date
-                ORDER BY timestamp DESC
-                LIMIT 4`,
-        format: 'JSONEachRow',
-      });
-
-      // fetch all results as JSON array
-      const parsedfirst4logs = await first4logs.json();
-      const parsedlast4logs = await last4logs.json();
-
-      return { parsedfirst4logs, parsedlast4logs };
-
-    } catch (err) {
-      console.error('Query error:', err);
-    }
-  } else {
-    console.log(`Error response is of unacceptable type`);
-  }
-};
+type labelKeyString = "deployment.environment" | "host.name" | "k8s.cluster.name" | "k8s.container.name" | "k8s.deployment.name" | "k8s.node.name" | "k8s.daemonset.name"
 
 
 
@@ -169,7 +116,27 @@ server.on('request', (req, res) => {
         console.log(`The list of hosts recived ${query.host} `);
         console.log('calling getHostLogs function');
 
-        getHostLogs(query.host).then((e) => {
+        getLogs(query.host, "host.name").then((e) => {
+          res.write((JSON.stringify(e)))
+          res.end();
+        })
+
+      }
+      if (req.url.startsWith('/api/daemonlogs')) {
+        console.log(`The list of daemonsets recived ${query.daemonsets} `);
+        console.log('calling getLogs function');
+
+        getLogs(query.daemonsets, "k8s.daemonset.name").then((e) => {
+          res.write((JSON.stringify(e)))
+          res.end();
+        })
+
+      }
+      if (req.url.startsWith('/api/deploylogs')) {
+        console.log(`The list of deployments recived ${query.deployments} `);
+        console.log('calling getLogs function');
+
+        getLogs(query.deployments, "k8s.deployment.name").then((e) => {
           res.write((JSON.stringify(e)))
           res.end();
         })
@@ -251,8 +218,6 @@ async function getDistinctResources() {
   }
 }
 
-
-
 function getDaemonSets(selectedClusters: Array<string> | string | undefined, allResources: RowJson[]): Array<string> {
   if (Array.isArray(selectedClusters) || (typeof (selectedClusters) === 'string')) {
     const filteredResources = allResources.filter((resource) => selectedClusters.includes(JSON.parse(resource.labels)["k8s.cluster.name"]))
@@ -264,7 +229,8 @@ function getDaemonSets(selectedClusters: Array<string> | string | undefined, all
     return []
   }
   ;
-}
+};
+
 function getDeployments(selectedClusters: Array<string> | string | undefined, allResources: RowJson[]): Array<string> {
   if (Array.isArray(selectedClusters) || (typeof (selectedClusters) === 'string')) {
 
@@ -279,7 +245,6 @@ function getDeployments(selectedClusters: Array<string> | string | undefined, al
   }
 };
 
-
 function getClusters(allResources: RowJson[]): Array<string> {
   const filteredEnvs = [...new Set(allResources.map(obj => JSON.parse(obj.labels)["k8s.cluster.name"]))];
   console.log('Filtered Envs are: ' + filteredEnvs);
@@ -293,4 +258,57 @@ function getHosts(allResources: RowJson[]) {
   // finding distinct values
   const filteredHosts = [...new Set(filteredResources.map(obj => JSON.parse(obj.labels)["host.name"]))];
   return filteredHosts;
+};
+
+async function getLogs(labelValueString: Array<string> | string | undefined, labelKeyString: labelKeyString) {
+  if (Array.isArray(labelValueString) || (typeof (labelValueString) === 'string')) {
+    try {
+      let sqlInString: string[] | string
+      if (Array.isArray(labelValueString)) {
+        sqlInString = `${labelValueString.join("','")}`
+      } else {
+        sqlInString = `${labelValueString}`;
+      }
+      console.log(`sql string is '${sqlInString}'`)
+      const first4logs = await client.query({
+        query: `SELECT * FROM signoz_logs.logs_v2
+                WHERE
+                     resource_fingerprint IN (
+                          SELECT fingerprint
+                          FROM signoz_logs.logs_v2_resource
+                          WHERE simpleJSONExtractString(labels, '${labelKeyString}') in ('${sqlInString}')
+                       )
+                AND ts_bucket_start <= 1764684622 --current date
+                AND ts_bucket_start >= 1762089143 --current date
+                ORDER BY timestamp ASC
+                LIMIT 4`,
+        format: 'JSONEachRow',
+      });
+      const last4logs = await client.query({
+        query: `SELECT * FROM signoz_logs.logs_v2
+                WHERE
+                     resource_fingerprint IN (
+                          SELECT fingerprint
+                          FROM signoz_logs.logs_v2_resource
+                          WHERE simpleJSONExtractString(labels, '${labelKeyString}') in ('${sqlInString}')
+                       )
+                AND ts_bucket_start <= 1764684622 --current date
+                AND ts_bucket_start >= 1762089143 --current date
+                ORDER BY timestamp DESC
+                LIMIT 4`,
+        format: 'JSONEachRow',
+      });
+
+      // fetch all results as JSON array
+      const parsedfirst4logs = await first4logs.json();
+      const parsedlast4logs = await last4logs.json();
+
+      return { parsedfirst4logs, parsedlast4logs };
+
+    } catch (err) {
+      console.error('Query error:', err);
+    }
+  } else {
+    console.log(`Error response is of unacceptable type`);
+  }
 };
