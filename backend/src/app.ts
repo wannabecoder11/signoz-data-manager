@@ -166,8 +166,8 @@ async function getLogs(labelValueString: queryParm, labelKeyString: labelKeyStri
                        )
                 AND ts_bucket_start <= ${parsedToDate.data.getTime()/1000} --current date in epoch seconds
                 AND ts_bucket_start >= ${parsedFromDate.data.getTime()/1000} --current date
-                ${logLevel ? `AND attributes_string['level'] in (${logLevelSQL})` : ''}
-                ${statusCode ? `AND attributes_number['status'] in (${statusCodeSQL})` : ''}
+                ${logLevel ? `AND attributes_string['level'] in ('${logLevelSQL}')` : ''}
+                ${statusCode ? `AND attributes_number['status'] in ('${statusCodeSQL}')` : ''}
                 ORDER BY timestamp ASC
                 LIMIT 4`,
         format: 'JSONEachRow',
@@ -182,8 +182,8 @@ async function getLogs(labelValueString: queryParm, labelKeyString: labelKeyStri
                        )
                 AND ts_bucket_start <= ${parsedToDate.data.getTime()/1000} --current date
                 AND ts_bucket_start >= ${parsedFromDate.data.getTime()/1000} --current date
-                ${logLevel ? `AND attributes_string['level'] in (${logLevelSQL})` : ''}
-                ${statusCode ? `AND attributes_number['status'] in (${statusCodeSQL})` : ''}
+                ${logLevel ? `AND attributes_string['level'] in ('${logLevelSQL}')` : ''}
+                ${statusCode ? `AND attributes_number['status'] in ('${statusCodeSQL}')` : ''}
                 ORDER BY timestamp DESC
                 LIMIT 4`,
         format: 'JSONEachRow',
